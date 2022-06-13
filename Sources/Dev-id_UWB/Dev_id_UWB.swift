@@ -13,7 +13,7 @@ public class Dev_id_UWB: NSObject, ObservableObject {
     public let log = Logger()
         
     @Published public var receivedMsg: String? = nil
-    @Published public var inputMsg: String? = nil
+    @Published public var inputMsg: String = ""
     @Published public var receivedImage: UIImage?
     @Published public var inputImage: UIImage?
     
