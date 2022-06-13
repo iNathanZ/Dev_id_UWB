@@ -42,7 +42,7 @@ public class Dev_id_UWB: NSObject, ObservableObject {
         self.serviceBrowser.stopBrowsingForPeers()
     }
     
-    func sendMessage(message: String) {
+    public func sendMessage(message: String) {
         precondition(Thread.isMainThread)
         if !session.connectedPeers.isEmpty {
             if let vSelectedDevice = selectedDevice {
@@ -55,7 +55,7 @@ public class Dev_id_UWB: NSObject, ObservableObject {
         }
     }
     
-    func sendImage() {
+    public func sendImage() {
         precondition(Thread.isMainThread)
         if !session.connectedPeers.isEmpty {
             if let vSelectedDevice = selectedDevice {
