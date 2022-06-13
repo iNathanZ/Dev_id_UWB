@@ -11,12 +11,14 @@ class Dev_id_UWB: NSObject, ObservableObject {
     private let serviceAdvertiser: MCNearbyServiceAdvertiser
     private let serviceBrowser: MCNearbyServiceBrowser
     private let log = Logger()
+        
+    @Published var receivedMsg: String? = nil
+    @Published var inputMsg: String? = nil
+    @Published var receivedImage: UIImage?
+    @Published var inputImage: UIImage?
     
     @Published var connectedPeers: [MCPeerID] = []
-    @Published var msgString: String? = nil
-    @Published var msgToSend: String = ""
-    @Published var inputImage: UIImage?
-    @Published var receivedImage: UIImage?
+
     @Published var selectedDevice: MCPeerID? = nil
     
     override init() {
@@ -97,7 +99,7 @@ extension Dev_id_UWB: MCSessionDelegate {
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8) {
             DispatchQueue.main.async {
-                self.msgString = string
+                self.receivedMsg = string
             }
         }
         if let image = UIImage(data: data, scale: 1.0) {
