@@ -21,7 +21,7 @@ public class Dev_id_UWB: NSObject, ObservableObject {
 
     @Published var selectedDevice: MCPeerID? = nil
     
-    override init() {
+    public override init() {
         precondition(Thread.isMainThread)
         self.session = MCSession(peer: myPeerId)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
