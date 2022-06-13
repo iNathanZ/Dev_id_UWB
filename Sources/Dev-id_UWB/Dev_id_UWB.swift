@@ -69,6 +69,19 @@ public class Dev_id_UWB: NSObject, ObservableObject {
         }
     }
     
+    public func sendData(data: Data) {
+        precondition(Thread.isMainThread)
+        if !session.connectedPeers.isEmpty {
+            if let vSelectedDevice = selectedDevice {
+                do {
+                    try session.send(data, toPeers: [vSelectedDevice], with: .reliable)
+                } catch {
+                    log.error("Error for sending: \(String(describing: error))")
+                }
+            }
+        }
+    }
+    
 }
 
 @available(iOS 14.0, *)
