@@ -73,30 +73,30 @@ public class Dev_id_UWB: NSObject, ObservableObject {
 
 @available(iOS 14.0, *)
 extension Dev_id_UWB: MCNearbyServiceBrowserDelegate {
-    func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
+    public func browser(_ browser: MCNearbyServiceBrowser, didNotStartBrowsingForPeers error: Error) {
         log.error("ServiceBrowser didNotStartBrowsingForPeers: \(String(describing: error))")
     }
 
-    func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
+    public func browser(_ browser: MCNearbyServiceBrowser, foundPeer peerID: MCPeerID, withDiscoveryInfo info: [String: String]?) {
         log.info("ServiceBrowser found peer: \(peerID)")
         browser.invitePeer(peerID, to: session, withContext: nil, timeout: 10)
     }
 
-    func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
+    public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         log.info("ServiceBrowser lost peer: \(peerID)")
     }
 }
 
 @available(iOS 14.0, *)
 extension Dev_id_UWB: MCSessionDelegate {
-    func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
+    public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
         DispatchQueue.main.async {
             self.connectedPeers = session.connectedPeers
         }
     }
 
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+    public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8) {
             DispatchQueue.main.async {
                 self.receivedMsg = string
@@ -139,12 +139,12 @@ extension MCSessionState: CustomDebugStringConvertible {
 
 @available(iOS 14.0, *)
 extension Dev_id_UWB: MCNearbyServiceAdvertiserDelegate {
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
+    public func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didNotStartAdvertisingPeer error: Error) {
         precondition(Thread.isMainThread)
         log.error("ServiceAdvertiser didNotStartAdvertisingPeer: \(String(describing: error))")
     }
 
-    func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
+    public func advertiser(_ advertiser: MCNearbyServiceAdvertiser, didReceiveInvitationFromPeer peerID: MCPeerID, withContext context: Data?, invitationHandler: @escaping (Bool, MCSession?) -> Void) {
         precondition(Thread.isMainThread)
         log.info("didReceiveInvitationFromPeer \(peerID)")
         invitationHandler(true, session)
