@@ -5,7 +5,7 @@ import os
 @available(iOS 14.0, *)
 public class Dev_id_UWB: NSObject, ObservableObject {
 
-    public let serviceType = "uwb_session"
+    public let serviceType = "uwb-session"
     public let session: MCSession
     public let myPeerId = MCPeerID(displayName: UIDevice.current.name)
     public let serviceAdvertiser: MCNearbyServiceAdvertiser
