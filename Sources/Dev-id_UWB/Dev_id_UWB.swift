@@ -3,7 +3,7 @@ import MultipeerConnectivity
 import os
 
 @available(iOS 14.0, *)
-class Dev_id_UWB: NSObject, ObservableObject {
+public class Dev_id_UWB: NSObject, ObservableObject {
 
     private let serviceType = "uwb_session"
     private let session: MCSession
