@@ -11,7 +11,7 @@ File > Add package > Paste this [repository URL](https://github.com/iNathanZ/Dev
 ## Uses
 
 The Dev_id_UWB class initialization already creates the session.
-Just call it as a `@StateObject` and you can use the functions and variables.
+Just call it as a `@StateObject var uwbSession: Dev_id_UWB = .init()` and you can use the functions and variables.
 
 #### Variables
 - `receivedMsg: String?` - A nullable string received from another device
