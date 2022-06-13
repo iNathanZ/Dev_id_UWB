@@ -24,6 +24,7 @@ Just call it as a `@StateObject var uwbSession: Dev_id_UWB = .init()` and you ca
 #### Functions
 - `sendMessage(message: String)` - Send a message to the selected device
 - `sendImage()` - Send the inputImage to the selected device
+- `sendData(data: Data)` - Send a data to the selected device
 
 ## Development
 
