@@ -5,21 +5,21 @@ import os
 @available(iOS 14.0, *)
 public class Dev_id_UWB: NSObject, ObservableObject {
 
-    private let serviceType = "uwb_session"
-    private let session: MCSession
-    private let myPeerId = MCPeerID(displayName: UIDevice.current.name)
-    private let serviceAdvertiser: MCNearbyServiceAdvertiser
-    private let serviceBrowser: MCNearbyServiceBrowser
-    private let log = Logger()
+    public let serviceType = "uwb_session"
+    public let session: MCSession
+    public let myPeerId = MCPeerID(displayName: UIDevice.current.name)
+    public let serviceAdvertiser: MCNearbyServiceAdvertiser
+    public let serviceBrowser: MCNearbyServiceBrowser
+    public let log = Logger()
         
-    @Published var receivedMsg: String? = nil
-    @Published var inputMsg: String? = nil
-    @Published var receivedImage: UIImage?
-    @Published var inputImage: UIImage?
+    @Published public var receivedMsg: String? = nil
+    @Published public var inputMsg: String? = nil
+    @Published public var receivedImage: UIImage?
+    @Published public var inputImage: UIImage?
     
-    @Published var connectedPeers: [MCPeerID] = []
+    @Published public var connectedPeers: [MCPeerID] = []
 
-    @Published var selectedDevice: MCPeerID? = nil
+    @Published public var selectedDevice: MCPeerID? = nil
     
     public override init() {
         precondition(Thread.isMainThread)
