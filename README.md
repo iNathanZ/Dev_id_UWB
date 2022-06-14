@@ -7,6 +7,17 @@ This package is a built-in class allowing to create NearbyInteractions Sessions,
 ## Installation
 You just need to add this package with the Swift Package Manager.
 File > Add package > Paste this [repository URL](https://github.com/iNathanZ/Dev_id_UWB)
+Don't forget to add the local network capability.
+Paste this code into the info.plist:
+```
+<key>NSLocalNetworkUsageDescription</key>
+<string>Reason for using Bonjour that the user can understand</string>
+<key>NSBonjourServices</key>
+<array>
+    <string>_uwb-session._tcp</string>
+    <string>_uwb-session._udp</string>
+</array>
+```
 
 ## Uses
 
