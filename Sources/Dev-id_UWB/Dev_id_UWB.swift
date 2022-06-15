@@ -11,6 +11,7 @@ public class Dev_id_UWB: NSObject, ObservableObject {
     public let serviceAdvertiser: MCNearbyServiceAdvertiser
     public let serviceBrowser: MCNearbyServiceBrowser
     public let log = Logger()
+    public var myInformations = PeerInformations(name: "", profilePictureData: nil)
         
     @Published public var receivedMsg: String? = nil
     @Published public var inputMsg: String = ""
@@ -18,11 +19,17 @@ public class Dev_id_UWB: NSObject, ObservableObject {
     @Published public var inputImage: UIImage?
     
     @Published public var connectedPeers: [MCPeerID] = []
+    @Published public var connectedPeersInformations: [PeerInformations] = []
 
     @Published public var selectedDevice: MCPeerID? = nil
     
+    
     public override init() {
         precondition(Thread.isMainThread)
+        
+        self.myInformations.name = UserDefaults.standard.object(forKey: "ido_username") as? String ?? ""
+        self.myInformations.profilePictureData = UserDefaults.standard.data(forKey: "ido_profilepicture")
+        
         self.session = MCSession(peer: myPeerId)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
         self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
@@ -69,12 +76,32 @@ public class Dev_id_UWB: NSObject, ObservableObject {
         }
     }
     
-    public func sendData(data: Data) {
+    public func sendData(data: Data, targetDevice: MCPeerID?) {
         precondition(Thread.isMainThread)
         if !session.connectedPeers.isEmpty {
+            if let vTargetDevice = targetDevice {
+                do {
+                    try session.send(data, toPeers: [vTargetDevice], with: .reliable)
+                } catch {
+                    log.error("Error for sending: \(String(describing: error))")
+                }
+            }
             if let vSelectedDevice = selectedDevice {
                 do {
                     try session.send(data, toPeers: [vSelectedDevice], with: .reliable)
+                } catch {
+                    log.error("Error for sending: \(String(describing: error))")
+                }
+            }
+        }
+    }
+    
+    public func sendPeerInformations(targetDevice: MCPeerID) {
+        precondition(Thread.isMainThread)
+        if !session.connectedPeers.isEmpty {
+            if let vData = getDataFromPeerInformations(infos: self.myInformations) {
+                do {
+                    try session.send(vData, toPeers: [targetDevice], with: .reliable)
                 } catch {
                     log.error("Error for sending: \(String(describing: error))")
                 }
@@ -106,6 +133,9 @@ extension Dev_id_UWB: MCSessionDelegate {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
         DispatchQueue.main.async {
             self.connectedPeers = session.connectedPeers
+            if state.debugDescription == "connected" {
+                self.sendPeerInformations(targetDevice: peerID)
+            }
         }
     }
 
@@ -118,6 +148,12 @@ extension Dev_id_UWB: MCSessionDelegate {
         if let image = UIImage(data: data, scale: 1.0) {
             DispatchQueue.main.async {
                 self.receivedImage = image
+            }
+        }
+        if let vInformations = getPeerInformationsFromData(data: data) {
+            DispatchQueue.main.async {
+                print("informations: \(vInformations)")
+                self.connectedPeersInformations += [vInformations]
             }
         }
     }
