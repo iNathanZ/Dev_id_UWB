@@ -31,6 +31,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     public var niSession: NISession?
     public var peerDiscoveryToken: NIDiscoveryToken?
     public var sharedTokenWithPeer = false
+    @Published public var distanceToSelected: Float?
     
     
     public override init() {
@@ -152,6 +153,23 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
             }
             sharedTokenWithPeer = true
         }
+    }
+    
+    public func session(_ session: NISession, didUpdate nearbyObjects: [NINearbyObject]) {
+        guard let peerToken = peerDiscoveryToken else {
+            fatalError("don't have peer token")
+        }
+
+        // Find the right peer.
+        let peerObj = nearbyObjects.first { (obj) -> Bool in
+            return obj.discoveryToken == peerToken
+        }
+
+        guard let nearbyObjectUpdate = peerObj else {
+            return
+        }
+        
+        self.distanceToSelected = nearbyObjectUpdate.distance
     }
     
 }
