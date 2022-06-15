@@ -9,10 +9,10 @@ import Foundation
 import UIKit
 
 public struct PeerInformations: Codable {
-    var name: String
-    var profilePictureData: Data?
+    public var name: String
+    public var profilePictureData: Data?
     
-    func getProfilePicture() -> UIImage? {
+    public func getProfilePicture() -> UIImage? {
         if let vProfilePictureData = self.profilePictureData {
             let decoded = try! PropertyListDecoder().decode(Data.self, from: vProfilePictureData)
             return UIImage(data: decoded)
