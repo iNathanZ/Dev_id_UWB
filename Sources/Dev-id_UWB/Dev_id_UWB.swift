@@ -1,10 +1,12 @@
 import Foundation
 import MultipeerConnectivity
 import os
+import NearbyInteraction
 
 @available(iOS 14.0, *)
-public class Dev_id_UWB: NSObject, ObservableObject {
+public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
 
+    //MPC
     public let serviceType = "uwb-session"
     public let session: MCSession
     public let myPeerId = MCPeerID(displayName: UIDevice.current.name)
@@ -20,8 +22,15 @@ public class Dev_id_UWB: NSObject, ObservableObject {
     
     @Published public var connectedPeers: [MCPeerID] = []
     @Published public var connectedPeersInformations: [PeerInformations] = []
+    @Published public var peersDict: [MCPeerID:PeerInformations] = []
 
     @Published public var selectedDevice: MCPeerID? = nil
+    
+    
+    //UWB
+    public var niSession: NISession?
+    public var peerDiscoveryToken: NIDiscoveryToken?
+    public var sharedTokenWithPeer = false
     
     
     public override init() {
@@ -109,6 +118,42 @@ public class Dev_id_UWB: NSObject, ObservableObject {
         }
     }
     
+    public func startNISession() {
+        niSession = NISession()
+        niSession?.delegate = self
+        sharedTokenWithPeer = false
+        
+        if selectedDevice != nil {
+            if let myToken = niSession?.discoveryToken {
+                print("Initializing")
+                if !sharedTokenWithPeer {
+                    shareMyDiscoveryToken(token: myToken)
+                }
+                guard let peerToken = peerDiscoveryToken else {
+                    return
+                }
+                let config = NINearbyPeerConfiguration(peerToken: peerToken)
+                niSession?.run(config)
+            } else {
+                fatalError("Unable to get self discovery token, is this session invalidated?")
+            }
+        }
+    }
+    
+    func shareMyDiscoveryToken(token: NIDiscoveryToken) {
+        guard let encodedData = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
+            fatalError("Unexpectedly failed to encode discovery token.")
+        }
+        if let vSelectedDevice = selectedDevice {
+            do {
+                try session.send(encodedData, toPeers: [vSelectedDevice], with: .reliable)
+            } catch let error {
+                NSLog("Error sending data: \(error)")
+            }
+            sharedTokenWithPeer = true
+        }
+    }
+    
 }
 
 @available(iOS 14.0, *)
@@ -143,6 +188,9 @@ extension Dev_id_UWB: MCSessionDelegate {
         if let string = String(data: data, encoding: .utf8) {
             DispatchQueue.main.async {
                 self.receivedMsg = string
+                if string == "START_NISESSION" {
+                    self.startNISession()
+                }
             }
         }
         if let image = UIImage(data: data, scale: 1.0) {
