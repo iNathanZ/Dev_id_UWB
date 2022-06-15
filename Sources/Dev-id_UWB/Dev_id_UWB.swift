@@ -22,7 +22,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     
     @Published public var connectedPeers: [MCPeerID] = []
     @Published public var connectedPeersInformations: [PeerInformations] = []
-    @Published public var peersDict: [MCPeerID:PeerInformations] = []
+    @Published public var peersDict = [MCPeerID:PeerInformations]()
 
     @Published public var selectedDevice: MCPeerID? = nil
     
@@ -202,6 +202,7 @@ extension Dev_id_UWB: MCSessionDelegate {
             DispatchQueue.main.async {
                 print("informations: \(vInformations)")
                 self.connectedPeersInformations += [vInformations]
+                self.peersDict.updateValue(vInformations, forKey: peerID)
             }
         }
     }
