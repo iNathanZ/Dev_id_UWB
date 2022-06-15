@@ -140,7 +140,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         }
     }
     
-    func shareMyDiscoveryToken(token: NIDiscoveryToken) {
+    public func shareMyDiscoveryToken(token: NIDiscoveryToken) {
         guard let encodedData = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
             fatalError("Unexpectedly failed to encode discovery token.")
         }
