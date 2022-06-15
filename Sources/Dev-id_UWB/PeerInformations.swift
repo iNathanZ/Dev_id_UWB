@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public struct PeerInformations: Codable {
+public struct PeerInformations: Codable, Hashable {
     public var name: String
     public var profilePictureData: Data?
     
