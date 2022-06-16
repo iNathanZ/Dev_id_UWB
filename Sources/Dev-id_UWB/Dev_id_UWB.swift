@@ -4,7 +4,7 @@ import os
 import NearbyInteraction
 
 @available(iOS 14.0, *)
-public class Dev_id_UWB: NSObject, ObservableObject {
+public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
 
     //MPC
     public let serviceType = "uwb-session"
