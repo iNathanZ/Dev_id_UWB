@@ -29,8 +29,8 @@ public class Dev_id_UWB: NSObject, ObservableObject {
     
     //UWB
     @Published public var niSession: NISession?
-    public var peerDiscoveryToken: NIDiscoveryToken?
-    public var sharedTokenWithPeer = false
+    @Published public var peerDiscoveryToken: NIDiscoveryToken?
+    @Published public var sharedTokenWithPeer = false
     @Published public var distanceToSelected: Float?
     
     
