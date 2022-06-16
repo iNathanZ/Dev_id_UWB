@@ -28,7 +28,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     
     
     //UWB
-    public var niSession: NISession?
+    @Published public var niSession: NISession?
     public var peerDiscoveryToken: NIDiscoveryToken?
     public var sharedTokenWithPeer = false
     @Published public var distanceToSelected: Float?
@@ -141,6 +141,17 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         }
     }
     
+    public func stopNISession() {
+        niSession = nil
+        niSession?.delegate = nil
+        sharedTokenWithPeer = false
+        selectedDevice = nil
+    }
+    
+    public func sendStopMsgNISession() {
+        sendData(data: "STOP_NISESSION".data(using: .utf8)!, targetDevice: selectedDevice)
+    }
+    
     public func shareMyDiscoveryToken(token: NIDiscoveryToken) {
         guard let encodedData = try? NSKeyedArchiver.archivedData(withRootObject: token, requiringSecureCoding: true) else {
             fatalError("Unexpectedly failed to encode discovery token.")
@@ -204,10 +215,13 @@ extension Dev_id_UWB: MCSessionDelegate {
 
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8) {
+            print("STRING RECEIVED:\(string)")
             DispatchQueue.main.async {
                 self.receivedMsg = string
                 if string == "START_NISESSION" {
                     self.startNISession()
+                } else if string == "STOP_NISESSION" {
+                    self.stopNISession()
                 }
             }
         }
@@ -218,7 +232,7 @@ extension Dev_id_UWB: MCSessionDelegate {
         }
         if let vInformations = getPeerInformationsFromData(data: data) {
             DispatchQueue.main.async {
-                print("informations: \(vInformations)")
+                print("INFORMATIONS RECEIVED:\(vInformations)")
                 self.connectedPeersInformations += [vInformations]
                 self.peersDict.updateValue(vInformations, forKey: peerID)
             }
