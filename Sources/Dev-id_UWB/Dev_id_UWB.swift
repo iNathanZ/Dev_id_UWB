@@ -166,6 +166,10 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         }
     }
     
+}
+
+@available(iOS 14.0, *)
+extension Dev_id_UWB: NISessionDelegate {
     public func session(_ session: NISession, didUpdate nearbyObjects: [NINearbyObject]) {
         guard let peerToken = peerDiscoveryToken else {
             fatalError("don't have peer token")
@@ -182,7 +186,6 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         
         self.distanceToSelected = nearbyObjectUpdate.distance
     }
-    
 }
 
 @available(iOS 14.0, *)
