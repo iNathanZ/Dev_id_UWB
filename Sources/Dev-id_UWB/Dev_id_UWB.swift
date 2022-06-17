@@ -26,7 +26,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
             } else if value == "STOP_NISESSION" {
                 self?.stopNISession()
             }
-        }
+        }.store(in: &bag)
     }
     
     public func startNISession() {
