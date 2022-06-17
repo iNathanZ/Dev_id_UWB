@@ -28,7 +28,7 @@ public class MPCClient: NSObject, ObservableObject {
     
     @Published public var connectedPeers: [MCPeerID] = []
     @Published public var connectedPeersInformations: [PeerInformations] = []
-    @Published public var peersDict = [MCPeerID:PeerInformations]()
+    @Published public var peersDict: [MCPeerID:PeerInformations] = [:]
 
     @Published public var selectedDevice: MCPeerID? = nil
 
@@ -164,7 +164,7 @@ extension MPCClient: MCSessionDelegate {
             DispatchQueue.main.async {
                 print("INFORMATIONS RECEIVED:\(vInformations)")
                 self.connectedPeersInformations += [vInformations]
-                self.peersDict.updateValue(vInformations, forKey: peerID)
+                self.peersDict[peerID] = vInformations
             }
         }
     }
