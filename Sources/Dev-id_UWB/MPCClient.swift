@@ -133,6 +133,7 @@ extension MPCClient: MCNearbyServiceBrowserDelegate {
 
     public func browser(_ browser: MCNearbyServiceBrowser, lostPeer peerID: MCPeerID) {
         log.info("ServiceBrowser lost peer: \(peerID)")
+        self.peersDict = self.peersDict.removeKey(peerID)
     }
 }
 

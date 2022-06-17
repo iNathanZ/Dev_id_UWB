@@ -13,4 +13,9 @@ extension Dictionary {
         result[key] = value
         return result
     }
+    func removeKey(_ key: Key) -> [Key: Value] {
+        var result = self
+        result[key] = nil
+        return result
+    }
 }
