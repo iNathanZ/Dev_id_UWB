@@ -19,6 +19,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     
     public override init() {
         super.init()
+        mpcClient = MPCClient()
         self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
             if value == "START_NISESSION" {
                 self?.startNISession()
