@@ -7,7 +7,8 @@ import Combine
 @available(iOS 14.0, *)
 public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     
-    @Published public var mpcClient: MPCClient?
+    public var mpcClient: MPCClient?
+    @Published var subscribedDict: [MCPeerID:PeerInformations] = [:]
     
     //UWB
     @Published public var niSession: NISession?
@@ -27,6 +28,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
                 self?.stopNISession()
             }
         }.store(in: &bag)
+        mpcClient?.$peersDict.assign(to: \.subscribedDict, on: self).store(in: &bag)
     }
     
     public func startNISession() {
