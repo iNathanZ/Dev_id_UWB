@@ -20,6 +20,10 @@ public class MPCClient: NSObject, ObservableObject {
     public let serviceBrowser: MCNearbyServiceBrowser
     public let log = Logger()
     public var myInformations = PeerInformations(name: "", profilePictureData: nil)
+    
+    var peerDataHandler: ((Data, MCPeerID) -> Void)?
+    var peerConnectedHandler: ((MCPeerID) -> Void)?
+    var peerDisconnectedHandler: ((MCPeerID) -> Void)?
         
     @Published public var receivedMsg: String? = nil
     @Published public var inputMsg: String = ""
@@ -118,6 +122,22 @@ public class MPCClient: NSObject, ObservableObject {
         }
     }
     
+    private func peerConnected(peerID: MCPeerID) {
+        if let handler = peerConnectedHandler {
+            DispatchQueue.main.async {
+                handler(peerID)
+            }
+        }
+    }
+    
+    private func peerDisconnected(peerID: MCPeerID) {
+        if let handler = peerDisconnectedHandler {
+            DispatchQueue.main.async {
+                handler(peerID)
+            }
+        }
+    }
+    
 }
 
 @available(iOS 14.0, *)
@@ -141,19 +161,32 @@ extension MPCClient: MCNearbyServiceBrowserDelegate {
 extension MPCClient: MCSessionDelegate {
     public func session(_ session: MCSession, peer peerID: MCPeerID, didChange state: MCSessionState) {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
-        DispatchQueue.main.async {
-            self.connectedPeers = session.connectedPeers
-            if state.debugDescription == "connected" {
-                self.sendPeerInformations(targetDevice: peerID)
-            }
+        switch state {
+        case .connected:
+            peerConnected(peerID: peerID)
+        case .notConnected:
+            peerDisconnected(peerID: peerID)
+        case .connecting:
+            break
+        @unknown default:
+            fatalError("Unhandled MCSessionState")
         }
+//        DispatchQueue.main.async {
+//            self.connectedPeers = session.connectedPeers
+//            if state.debugDescription == "connected" {
+//                self.sendPeerInformations(targetDevice: peerID)
+//            }
+//        }
     }
 
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8) {
             print("STRING RECEIVED:\(string)")
-            DispatchQueue.main.async {
-                self.receivedMsg = string
+            if let handler = peerDataHandler {
+                DispatchQueue.main.async {
+                    self.receivedMsg = string
+                    handler(data, peerID)
+                }
             }
         }
         if let image = UIImage(data: data, scale: 1.0) {

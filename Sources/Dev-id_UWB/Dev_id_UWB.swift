@@ -21,6 +21,9 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     public override init() {
         super.init()
         mpcClient = MPCClient()
+        mpcClient?.peerConnectedHandler = connectedToPeer
+        mpcClient?.peerDataHandler = dataReceivedHandler
+        mpcClient?.peerDisconnectedHandler = disconnectedFromPeer
         self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
             if value == "START_NISESSION" {
                 self?.startNISession()
@@ -76,6 +79,38 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
             }
             sharedTokenWithPeer = true
         }
+    }
+    
+    func connectedToPeer(peer: MCPeerID) {
+        guard let myToken = niSession?.discoveryToken else {
+            fatalError("Unexpectedly failed to initialize nearby interaction session.")
+        }
+        if !sharedTokenWithPeer {
+            shareMyDiscoveryToken(token: myToken)
+        }
+
+    }
+
+    func disconnectedFromPeer(peer: MCPeerID) {
+        if mpcClient?.selectedDevice == peer {
+            mpcClient?.selectedDevice = nil
+            sharedTokenWithPeer = false
+        }
+    }
+
+    func dataReceivedHandler(data: Data, peer: MCPeerID) {
+        guard let discoveryToken = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NIDiscoveryToken.self, from: data) else {
+            fatalError("Unexpectedly failed to decode discovery token.")
+        }
+        peerDidShareDiscoveryToken(peer: peer, token: discoveryToken)
+    }
+    
+    func peerDidShareDiscoveryToken(peer: MCPeerID, token: NIDiscoveryToken) {
+        // Create a configuration.
+        peerDiscoveryToken = token
+        let config = NINearbyPeerConfiguration(peerToken: token)
+        // Run the session.
+        niSession?.run(config)
     }
 }
 
