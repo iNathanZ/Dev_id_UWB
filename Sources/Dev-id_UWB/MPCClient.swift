@@ -164,7 +164,7 @@ extension MPCClient: MCSessionDelegate {
             DispatchQueue.main.async {
                 print("INFORMATIONS RECEIVED:\(vInformations)")
                 self.connectedPeersInformations += [vInformations]
-                self.peersDict[peerID] = vInformations
+                self.peersDict = self.peersDict.appending(peerID, vInformations)
             }
         }
     }
