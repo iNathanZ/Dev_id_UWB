@@ -7,7 +7,7 @@ import Combine
 @available(iOS 14.0, *)
 public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     
-    @Published public var mpcClient: MPCClient?
+    public var mpcClient: MPCClient?
     
     //UWB
     @Published public var niSession: NISession?
