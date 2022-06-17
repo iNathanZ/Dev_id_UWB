@@ -22,7 +22,6 @@ public class MPCClient: NSObject, ObservableObject {
     public var myInformations = PeerInformations(name: "", profilePictureData: nil)
     
     var peerDataHandler: ((Data, MCPeerID) -> Void)?
-    var peerConnectedHandler: ((MCPeerID) -> Void)?
     var peerDisconnectedHandler: ((MCPeerID) -> Void)?
         
     @Published public var receivedMsg: String? = nil
@@ -122,14 +121,6 @@ public class MPCClient: NSObject, ObservableObject {
         }
     }
     
-    private func peerConnected(peerID: MCPeerID) {
-        if let handler = peerConnectedHandler {
-            DispatchQueue.main.async {
-                handler(peerID)
-            }
-        }
-    }
-    
     private func peerDisconnected(peerID: MCPeerID) {
         if let handler = peerDisconnectedHandler {
             DispatchQueue.main.async {
@@ -163,7 +154,7 @@ extension MPCClient: MCSessionDelegate {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
         switch state {
         case .connected:
-            peerConnected(peerID: peerID)
+            break
         case .notConnected:
             peerDisconnected(peerID: peerID)
         case .connecting:
@@ -171,12 +162,12 @@ extension MPCClient: MCSessionDelegate {
         @unknown default:
             fatalError("Unhandled MCSessionState")
         }
-//        DispatchQueue.main.async {
-//            self.connectedPeers = session.connectedPeers
-//            if state.debugDescription == "connected" {
-//                self.sendPeerInformations(targetDevice: peerID)
-//            }
-//        }
+        DispatchQueue.main.async {
+            self.connectedPeers = session.connectedPeers
+            if state.debugDescription == "connected" {
+                self.sendPeerInformations(targetDevice: peerID)
+            }
+        }
     }
 
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {

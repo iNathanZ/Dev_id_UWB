@@ -21,7 +21,6 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     public override init() {
         super.init()
         mpcClient = MPCClient()
-        mpcClient?.peerConnectedHandler = connectedToPeer
         mpcClient?.peerDataHandler = dataReceivedHandler
         mpcClient?.peerDisconnectedHandler = disconnectedFromPeer
         self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
@@ -79,16 +78,6 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
             }
             sharedTokenWithPeer = true
         }
-    }
-    
-    func connectedToPeer(peer: MCPeerID) {
-        guard let myToken = niSession?.discoveryToken else {
-            fatalError("Unexpectedly failed to initialize nearby interaction session.")
-        }
-        if !sharedTokenWithPeer {
-            shareMyDiscoveryToken(token: myToken)
-        }
-
     }
 
     func disconnectedFromPeer(peer: MCPeerID) {
