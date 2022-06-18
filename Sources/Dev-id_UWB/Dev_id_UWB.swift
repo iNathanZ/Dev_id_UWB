@@ -102,10 +102,10 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
                 if !sharedTokenWithPeer {
                     shareMyDiscoveryToken(token: myToken)
                 }
-                guard let peerToken = peerDiscoveryToken else {
-                    return
-                }
-                let config = NINearbyPeerConfiguration(peerToken: peerToken)
+//                guard let peerToken = peerDiscoveryToken else {
+//                    return
+//                }
+                let config = NINearbyPeerConfiguration(peerToken: (niSession?.discoveryToken!)!)
                 niSession?.run(config)
             } else {
                 fatalError("Unable to get self discovery token, is this session invalidated?")
