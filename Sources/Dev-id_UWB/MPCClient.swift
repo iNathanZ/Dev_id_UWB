@@ -8,6 +8,7 @@
 import Foundation
 import MultipeerConnectivity
 import os
+import NearbyInteraction
 
 @available(iOS 14.0, *)
 public class MPCClient: NSObject, ObservableObject {
@@ -183,11 +184,8 @@ extension MPCClient: MCSessionDelegate {
     public func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         if let string = String(data: data, encoding: .utf8) {
             print("STRING RECEIVED:\(string)")
-            if let handler = peerDataHandler {
-                DispatchQueue.main.async {
-                    self.receivedMsg = string
-                    handler(data, peerID)
-                }
+            DispatchQueue.main.async {
+                self.receivedMsg = string
             }
         }
         if let image = UIImage(data: data, scale: 1.0) {
@@ -200,6 +198,11 @@ extension MPCClient: MCSessionDelegate {
                 print("INFORMATIONS RECEIVED:\(vInformations)")
                 self.connectedPeersInformations += [vInformations]
                 self.peersDict = self.peersDict.appending(peerID, vInformations)
+            }
+        }
+        if let handler = peerDataHandler, let _ = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NIDiscoveryToken.self, from: data) {
+            DispatchQueue.main.async {
+                handler(data, peerID)
             }
         }
     }

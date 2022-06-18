@@ -24,13 +24,13 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         mpcClient?.peerConnectedHandler = connectedToPeer
         mpcClient?.peerDataHandler = dataReceivedHandler
         mpcClient?.peerDisconnectedHandler = disconnectedFromPeer
-//        self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
-//            if value == "START_NISESSION" {
-//                self?.startNISession()
-//            } else if value == "STOP_NISESSION" {
-//                self?.stopNISession()
-//            }
-//        }.store(in: &bag)
+        self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
+            if value == "START_NISESSION" {
+                self?.startNISession()
+            } else if value == "STOP_NISESSION" {
+                self?.stopNISession()
+            }
+        }.store(in: &bag)
         mpcClient?.$peersDict.assign(to: \.subscribedDict, on: self).store(in: &bag)
     }
     
