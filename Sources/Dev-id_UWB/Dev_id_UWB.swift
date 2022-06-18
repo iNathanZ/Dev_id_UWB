@@ -56,6 +56,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
                 NSLog("Error sending data: \(error)")
             }
             sharedTokenWithPeer = true
+            self.peerDiscoveryToken = niSession?.discoveryToken
         }
     }
 
