@@ -22,6 +22,7 @@ public class MPCClient: NSObject, ObservableObject {
     public var myInformations = PeerInformations(name: "", profilePictureData: nil)
     
     var peerDataHandler: ((Data, MCPeerID) -> Void)?
+    var peerConnectedHandler: ((MCPeerID) -> Void)?
     var peerDisconnectedHandler: ((MCPeerID) -> Void)?
         
     @Published public var receivedMsg: String? = nil
@@ -129,6 +130,14 @@ public class MPCClient: NSObject, ObservableObject {
         }
     }
     
+    private func peerConnected(peerID: MCPeerID) {
+        if let handler = peerConnectedHandler {
+            DispatchQueue.main.async {
+                handler(peerID)
+            }
+        }
+    }
+    
 }
 
 @available(iOS 14.0, *)
@@ -154,6 +163,7 @@ extension MPCClient: MCSessionDelegate {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
         switch state {
         case .connected:
+            peerConnected(peerID: peerID)
             break
         case .notConnected:
             peerDisconnected(peerID: peerID)
