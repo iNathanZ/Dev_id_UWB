@@ -164,7 +164,7 @@ extension MPCClient: MCSessionDelegate {
         log.info("peer \(peerID) didChangeState: \(state.debugDescription)")
         switch state {
         case .connected:
-            peerConnected(peerID: peerID)
+//            peerConnected(peerID: peerID)
             break
         case .notConnected:
             peerDisconnected(peerID: peerID)
