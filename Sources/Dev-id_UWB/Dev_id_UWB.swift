@@ -24,36 +24,14 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         mpcClient?.peerConnectedHandler = connectedToPeer
         mpcClient?.peerDataHandler = dataReceivedHandler
         mpcClient?.peerDisconnectedHandler = disconnectedFromPeer
-        self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
-            if value == "START_NISESSION" {
-                self?.startNISession()
-            } else if value == "STOP_NISESSION" {
-                self?.stopNISession()
-            }
-        }.store(in: &bag)
+//        self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
+//            if value == "START_NISESSION" {
+//                self?.startNISession()
+//            } else if value == "STOP_NISESSION" {
+//                self?.stopNISession()
+//            }
+//        }.store(in: &bag)
         mpcClient?.$peersDict.assign(to: \.subscribedDict, on: self).store(in: &bag)
-    }
-    
-    public func startNISession() {
-        niSession = NISession()
-        niSession?.delegate = self
-        sharedTokenWithPeer = false
-        
-        if mpcClient?.selectedDevice != nil {
-            if let myToken = niSession?.discoveryToken {
-                print("Initializing")
-                if !sharedTokenWithPeer {
-                    shareMyDiscoveryToken(token: myToken)
-                }
-                guard let peerToken = peerDiscoveryToken else {
-                    return
-                }
-                let config = NINearbyPeerConfiguration(peerToken: peerToken)
-                niSession?.run(config)
-            } else {
-                fatalError("Unable to get self discovery token, is this session invalidated?")
-            }
-        }
     }
     
     public func stopNISession() {
@@ -83,8 +61,10 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
 
     func disconnectedFromPeer(peer: MCPeerID) {
         if mpcClient?.selectedDevice == peer {
-            mpcClient?.selectedDevice = nil
+            niSession = nil
+            niSession?.delegate = nil
             sharedTokenWithPeer = false
+            mpcClient?.selectedDevice = nil
         }
     }
 
@@ -111,11 +91,36 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         mpcClient?.selectedDevice = peer
     }
     
+    public func startNISession() {
+        niSession = NISession()
+        niSession?.delegate = self
+        sharedTokenWithPeer = false
+        
+        if mpcClient?.selectedDevice != nil {
+            if let myToken = niSession?.discoveryToken {
+                print("Initializing")
+                if !sharedTokenWithPeer {
+                    shareMyDiscoveryToken(token: myToken)
+                }
+                guard let peerToken = peerDiscoveryToken else {
+                    return
+                }
+                let config = NINearbyPeerConfiguration(peerToken: peerToken)
+                niSession?.run(config)
+            } else {
+                fatalError("Unable to get self discovery token, is this session invalidated?")
+            }
+        }
+    }
+    
     func peerDidShareDiscoveryToken(peer: MCPeerID, token: NIDiscoveryToken) {
         // Create a configuration.
         peerDiscoveryToken = token
         let config = NINearbyPeerConfiguration(peerToken: token)
         // Run the session.
+        niSession = NISession()
+        niSession?.delegate = self
+        sharedTokenWithPeer = false
         niSession?.run(config)
     }
 }
