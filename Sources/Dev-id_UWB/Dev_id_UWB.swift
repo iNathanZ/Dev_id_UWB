@@ -133,15 +133,15 @@ extension Dev_id_UWB: NISessionDelegate {
             fatalError("don't have peer token")
         }
 
-        // Find the right peer.
-        let peerObj = nearbyObjects.first { (obj) -> Bool in
-            return obj.discoveryToken == peerToken
-        }
-
-        guard let nearbyObjectUpdate = peerObj else {
-            return
-        }
+//        // Find the right peer.
+//        let peerObj = nearbyObjects.first { (obj) -> Bool in
+//            return obj.discoveryToken == peerToken
+//        }
+//
+//        guard let nearbyObjectUpdate = peerObj else {
+//            return
+//        }
         
-        self.distanceToSelected = nearbyObjectUpdate.distance
+        self.distanceToSelected = nearbyObjects.first?.distance
     }
 }
