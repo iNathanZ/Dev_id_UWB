@@ -33,8 +33,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     }
     
     public func stopNISession() {
-        niSession = nil
-        niSession?.delegate = nil
+        niSession?.invalidate()
         sharedTokenWithPeer = false
         mpcClient?.selectedDevice = nil
     }
