@@ -55,8 +55,6 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
             } catch let error {
                 NSLog("Error sending data: \(error)")
             }
-            sharedTokenWithPeer = true
-            self.peerDiscoveryToken = niSession?.discoveryToken
         }
     }
 
@@ -93,20 +91,17 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     }
     
     public func startNISession() {
-        niSession = NISession()
-        niSession?.delegate = self
-        sharedTokenWithPeer = false
-        
         if mpcClient?.selectedDevice != nil {
             if let myToken = niSession?.discoveryToken {
+                peerDiscoveryToken = myToken
                 print("Initializing")
                 if !sharedTokenWithPeer {
                     shareMyDiscoveryToken(token: myToken)
                 }
-//                guard let peerToken = peerDiscoveryToken else {
-//                    return
-//                }
-                let config = NINearbyPeerConfiguration(peerToken: (niSession?.discoveryToken!)!)
+                guard let peerToken = peerDiscoveryToken else {
+                    return
+                }
+                let config = NINearbyPeerConfiguration(peerToken: peerToken)
                 niSession?.run(config)
             } else {
                 fatalError("Unable to get self discovery token, is this session invalidated?")
