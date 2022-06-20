@@ -25,9 +25,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         mpcClient?.peerDataHandler = dataReceivedHandler
         mpcClient?.peerDisconnectedHandler = disconnectedFromPeer
         self.mpcClient?.$receivedMsg.compactMap({ $0 }).sink { [weak self ] value in
-            if value == "START_NISESSION" {
-                self?.startNISession()
-            } else if value == "STOP_NISESSION" {
+            if value == "STOP_NISESSION" {
                 self?.stopNISession()
             }
         }.store(in: &bag)
@@ -61,8 +59,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
 
     func disconnectedFromPeer(peer: MCPeerID) {
         if mpcClient?.selectedDevice == peer {
-            niSession = nil
-            niSession?.delegate = nil
+            niSession?.invalidate()
             sharedTokenWithPeer = false
             mpcClient?.selectedDevice = nil
         }
@@ -94,6 +91,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     public func startNISession() {
         niSession = NISession()
         niSession?.delegate = self
+        sharedTokenWithPeer = false
         if mpcClient?.selectedDevice != nil {
             if let myToken = niSession?.discoveryToken {
                 peerDiscoveryToken = myToken
