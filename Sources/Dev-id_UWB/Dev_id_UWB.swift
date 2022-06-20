@@ -139,4 +139,8 @@ extension Dev_id_UWB: NISessionDelegate {
         
         self.distanceToSelected = nearbyObjectUpdate.distance
     }
+    
+    public func session(_ session: NISession, didInvalidateWith error: Error) {
+        print(error)
+    }
 }
