@@ -52,6 +52,7 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
         if let vSelectedDevice = mpcClient?.selectedDevice {
             do {
                 try mpcClient?.session.send(encodedData, toPeers: [vSelectedDevice], with: .reliable)
+                sharedTokenWithPeer = true
             } catch let error {
                 NSLog("Error sending data: \(error)")
             }
@@ -91,6 +92,8 @@ public class Dev_id_UWB: NSObject, NISessionDelegate, ObservableObject {
     }
     
     public func startNISession() {
+        niSession = NISession()
+        niSession?.delegate = self
         if mpcClient?.selectedDevice != nil {
             if let myToken = niSession?.discoveryToken {
                 peerDiscoveryToken = myToken
@@ -128,15 +131,15 @@ extension Dev_id_UWB: NISessionDelegate {
             fatalError("don't have peer token")
         }
 
-//        // Find the right peer.
-//        let peerObj = nearbyObjects.first { (obj) -> Bool in
-//            return obj.discoveryToken == peerToken
-//        }
-//
-//        guard let nearbyObjectUpdate = peerObj else {
-//            return
-//        }
+        // Find the right peer.
+        let peerObj = nearbyObjects.first { (obj) -> Bool in
+            return obj.discoveryToken == peerToken
+        }
+
+        guard let nearbyObjectUpdate = peerObj else {
+            return
+        }
         
-        self.distanceToSelected = nearbyObjects.first?.distance
+        self.distanceToSelected = nearbyObjectUpdate.distance
     }
 }
